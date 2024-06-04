@@ -1,0 +1,152 @@
+//funtion prototypes
+FlightNode* createNode(char* destination, char* date, float fare);
+void insertByFare(FlightNode **head, FlightNode **tail, FlightNode* newNode);
+void insertByDestination(FlightNode ** head, FlightNode ** tail, FlightNode * newNode);
+FlightNode* findFlight(FlightNode* head, char* destination, char* date);
+void deleteNode(FlightNode *node, FlightNode **head, FlightNode** tail);
+void displayListByFare(FlightNode* head);
+void displayListByDestination(FlightNode* head);
+void freeList(FlightNode* head);
+
+int main()
+{
+	FlightNode* fareHead = NULL;
+	FlightNode* fareTail = NULL;
+	FlightNode* destHead = NULL;
+	FlightNode* destTail = NULL;
+
+	//Array storing maximum length
+	char destination[31];
+	char date[31];
+	float fare{};
+	char input[30];
+
+	while (1)
+	{
+		//Asking user to enter destination
+		printf("Enter destination: ");
+		fgets(destination, sizeof(destination), stdin);
+		destination[strcspn(destination, "\n")] = '\0';
+
+		if (strcmp(destination, ".") == 0)
+			break;
+
+		//Asking user to enter date
+		printf("Enter date: ");
+		fgets(date, sizeof(date), stdin);
+		date[strcspn(date, "\n")] = '\0';
+
+		if (strcmp(date, ".") == 0)
+			break;
+
+		//Asking user to enter fare
+		printf("Enter fare: ");
+		fgets(input, sizeof(input), stdin);
+		sscanf_s(input, "%f", &fare);
+
+		FlightNode* newNode = createNode(destination, date, fare);
+
+		insertByFare(&fareHead, &fareTail, newNode);
+		insertByDestination(&destHead, &destTail, newNode);
+	}
+
+	//Displaying flights sorted by fare
+	printf("\nFlights sorted by Fare\n");
+	displayListByFare(fareHead);
+
+	//Displaying flights sorted by destination
+	printf("\nFlights sorted by destination\n");
+	displayListByDestination(destHead);
+
+	//Search destination of a flight
+	printf("Enter destination to search:");
+	fgets(destination, sizeof(destination), stdin);
+	destination[strcspn(destination, "\n")] = '\0';
+
+	//Search destination of a flight
+	printf("Enter date to search:");
+	fgets(date, sizeof(date), stdin);
+	date[strcspn(date, "\n")] = '\0';
+
+	FlightNode *foundFlight = findFlight(destHead, destination, date);
+	if (foundFlight)
+	{
+		printf("Fare for the flight is: %.2f\n", foundFlight->fare);
+
+		printf("Enter new fare (or same to keep changed): ");
+		fgets(input, sizeof(input), stdin);
+		sscanf_s(input, "%f", &fare);
+
+		if( fare!= foundFlight->fare)
+		{
+			foundFlight->fare = fare;
+			deleteNode(foundFlight, &fareHead, &fareTail);
+			insertByFare(&fareHead, &fareTail, foundFlight);
+		}
+		else
+		{
+			//print if fare gets unchanged
+			printf("Fare is unchanged.\n");
+		}
+	}
+ else
+ {
+	//print if flight is not found
+	printf("Flight not found.\n");
+ }
+
+ //displaying updated flights sorted by fare
+ printf("\nUpdated flights sorted by fare:\n");
+ displayListByFare(fareHead);
+
+ //displaying updated flights soreted by destination
+ printf("\nUpdated flights sorted by destination:\n");
+ displayListByDestination(destHead);
+
+ freeList(fareHead);
+
+ return 0;
+}
+
+/*  
+Function: createNode()
+Parameter:
+char* destination: pointer to a C-style string containing the destination of the flight.
+char* date: pointer to a C-style string containing the date of the flight.
+float fare: fare of the flight.
+Return Value:
+FlightNode pointer: pointer to the newly created FlightNode struct.
+Description: This function creates a new FlightNode struct and initializes its fields with the provided information. 
+*/
+FlightNode* createNode(char* destination, char* date, float fare)
+{
+	FlightNode* newNode = (FlightNode*)malloc(sizeof(FlightNode));
+	if (!newNode)
+	{
+		fprintf(stderr, "Memory allocation failed\n");
+		exit(EXIT_FAILURE);
+	}
+
+	newNode->destination = (char*)malloc((strlen(destination) + 1) * sizeof(char));
+	if (!newNode->destination)
+	{
+		fprintf(stderr, "Memory allocation failed\n");
+		exit(EXIT_FAILURE);
+	}
+	strcpy_s(newNode->destination, strlen(destination) + 1,destination);
+
+	newNode->date = (char*)malloc((strlen(date) + 1) * sizeof(char));
+	if (!newNode->date)
+	{
+		fprintf(stderr, "Memory allocation failed\n");
+		exit(EXIT_FAILURE);
+	}
+	strcpy_s(newNode->date, strlen(date) + 1,date);
+
+	newNode->fare = fare;
+	newNode->prevFare = NULL;
+	newNode->nextFare = NULL;
+	newNode->prevDest = NULL;
+	newNode->nextDest = NULL;
+	return newNode;
+}

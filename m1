@@ -1,0 +1,22 @@
+/*
+ * FILE:m1.cpp
+ * PROJECT:M1
+ * PROGRAMMER:MANREET THIND (Student ID:8982315)
+ * FIRSTVERSION:03/06/24
+ * DESCRIPTION :
+ * The functions in this file that keeps track of fares for flights and displays information about them.
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct FlightNode
+{
+	char* destination;
+	char* date;
+	float fare;
+	struct FlightNode* prevFare;
+	struct FlightNode* nextFare;
+	struct FlightNode* prevDest;
+	struct FlightNode* nextDest;
+};
